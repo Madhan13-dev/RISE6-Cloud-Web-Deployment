@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template_string
+﻿from flask import Flask, jsonify, render_template_string
 import os
 import socket
 from datetime import datetime, timezone
@@ -25,7 +25,7 @@ HTML = """
 <div class="wrap"><div class="card">
   <span class="badge">RISE 6.0 • Cloud Computing</span>
   <h1>Industry-Oriented Cloud Web Application</h1>
-  <p>This application is deployed on AWS with a load balancer, auto scaling, security controls and monitoring.</p>
+  <p>This application is deployed as a cloud web service with secure access, health monitoring and scalable deployment.</p>
   <div class="grid">
     <div class="item"><b>Instance</b><br>{{ hostname }}</div>
     <div class="item"><b>Time (UTC)</b><br>{{ time }}</div>
@@ -50,3 +50,4 @@ def health():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))
+
