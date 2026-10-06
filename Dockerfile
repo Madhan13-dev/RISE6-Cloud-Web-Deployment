@@ -11,4 +11,4 @@ COPY app.py .
 
 EXPOSE 8080
 
-CMD ["gunicorn", "--bind", "0.0.0.0:", "--workers", "2", "--access-logfile", "-", "app:app"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:$PORT --workers 2 --access-logfile - app:app"]
