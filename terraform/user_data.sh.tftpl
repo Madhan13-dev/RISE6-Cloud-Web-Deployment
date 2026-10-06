@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y python3 python3-pip amazon-cloudwatch-agent
+
+mkdir -p /opt/rise6
+echo '${app_code_b64}' | base64 -d > /opt/rise6/app.py
+echo '${requirements_b64}' | base64 -d > /opt/rise6/requirements.txt
+
+python3 -m pip install --break-system-packages -r /opt/rise6/requirements.txt
+
+cat > /etc/systemd/system/rise6-app.service <<'SERVICE'
+[Unit]
+Description=RISE 6.0 Flask Cloud Application
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/opt/rise6
+ExecStart=/usr/bin/python3 /opt/rise6/app.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/rise6-app.log
+StandardError=append:/var/log/rise6-app.log
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+systemctl daemon-reload
+systemctl enable --now rise6-app
+
+echo '${cw_config_b64}' | base64 -d > /opt/aws-cloudwatch-agent.json
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -c file:/opt/aws-cloudwatch-agent.json \
+  -s || true
